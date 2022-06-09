@@ -82,3 +82,36 @@ func TestNew(t *testing.T){
 	}
 }
 
+
+// func TestRows(t *testing.T){
+// 	matrix, err := New("1 2\n3 4")
+// 	if err != nil {
+// 		t.Error("Expected nil, got ", err)
+// 	}
+// 	if matrix.Rows() != 2 {
+// 		t.Error("Expected 2, got ", matrix.Rows())
+// 	}
+// }
+
+
+// func TestCols(t *testing.T){	
+// 	matrix, err := New("1 2\n3 4")
+// 	if err != nil {
+// 		t.Error("Expected nil, got ", err)
+// 	}
+// 	if matrix.Cols() != 2 {
+// 		t.Error("Expected 2, got ", matrix.Cols())
+// 	}
+// }
+
+func TestSet(t *testing.T){
+	matrix, err := New("1 2\n3 4")
+	if err != nil {
+		t.Error("Expected nil, got ", err)
+	}
+	matrix.Set(0, 0, 5)
+	if matrix.data[0] != 5 {
+		t.Error("Expected 5, got ", matrix.data[0])
+	}
+
+}

@@ -82,3 +82,15 @@ func TestNew(t *testing.T){
 	}
 }
 
+
+func TestSet(t *testing.T){
+	matrix, err := New("1 2\n3 4")
+	if err != nil {
+		t.Error("Expected nil, got ", err)
+	}
+	matrix.Set(0, 0, 5)
+	if matrix.data[0] != 5 {
+		t.Error("Expected 5, got ", matrix.data[0])
+	}
+
+}
