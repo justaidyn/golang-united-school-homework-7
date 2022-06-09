@@ -4,6 +4,10 @@ import (
 	"os"
 	"testing"
 	"time"
+	"errors"
+	"fmt"
+	"strconv"
+	"reflect"
 )
 
 // DO NOT EDIT THIS FUNCTION
@@ -60,39 +64,69 @@ func TestSwap(t *testing.T){
 
 
 func TestNew(t *testing.T){
-	matrix, err := New("1 2\n3 4")
-	if err != nil {
-		t.Error("Expected nil, got ", err)
+	tData := map[string]struct {
+		TestString string
+		Expected   *Matrix
+		Err        error
+	}{
+		"ProperData": {
+			"1 1 1\n2 2 2",
+			&Matrix{2, 3, []int{1, 1, 1, 2, 2, 2}},
+			nil,
+		},
+		"DiffRowsLength": {
+			"1 1 1\n2 2 2 2",
+			nil,
+			errors.Unwrap(fmt.Errorf("Rows need to be the same length")), // this is strange
+			// could not find better solution
+		},
+		"ImproperData": {
+			"a",
+			nil,
+			strconv.ErrSyntax,
+		},
 	}
-	if matrix.rows != 2 {
-		t.Error("Expected 2, got ", matrix.rows)
-	}
-	if matrix.cols != 2 {
-		t.Error("Expected 2, got ", matrix.cols)
-	}
-	if matrix.data[0] != 1 {
-		t.Error("Expected 1, got ", matrix.data[0])
-	}
-	if matrix.data[1] != 2 {
-		t.Error("Expected 2, got ", matrix.data[1])
-	}
-	if matrix.data[2] != 3 {
-		t.Error("Expected 3, got ", matrix.data[2])
-	}
-	if matrix.data[3] != 4 {
-		t.Error("Expected 4, got ", matrix.data[3])
+
+	for name, v := range tData {
+		t.Run(name, func(t *testing.T) {
+			got, err := New(v.TestString)
+			if err != nil && !errors.Is(errors.Unwrap(err), v.Err) { // could not find better solution, think
+				//  the error message from the New() needs some changes for better logic
+				t.Errorf("[%s] error expected:\"%v\", got:\"%v\".\n", name, v.Err, err)
+			}
+			if !reflect.DeepEqual(v.Expected, got) { // needs to be remembered when compare structs with slices&maps
+				t.Errorf("[%s] expected: %v, got %v", name, v.Expected, got)
+			}
+		})
 	}
 }
 
 
 func TestSet(t *testing.T){
-	matrix, err := New("1 2\n3 4")
-	if err != nil {
-		t.Error("Expected nil, got ", err)
+	baseMatrix := &Matrix{2, 3, []int{1, 1, 1, 2, 2, 2}}
+	needMatrixT := &Matrix{2, 3, []int{1, 1, 1, 2, 5, 2}}
+	needMatrixF := &Matrix{2, 3, []int{1, 1, 1, 2, 2, 2}}
+
+	tData := map[string]struct {
+		row            int
+		col            int
+		value          int
+		ExpectedMatrix *Matrix
+		Expected       bool
+	}{
+		"ProperData":     {1, 1, 5, needMatrixT, true},
+		"RowLessO":       {-1, 1, 5, baseMatrix, false},
+		"ImproperRowNum": {2, 1, 5, needMatrixF, false},
+		"ImproperColNum": {1, 3, 5, needMatrixF, false},
 	}
-	matrix.Set(0, 0, 5)
-	if matrix.data[0] != 5 {
-		t.Error("Expected 5, got ", matrix.data[0])
+
+	for name, v := range tData {
+		t.Run(name, func(t *testing.T) {
+			got := baseMatrix.Set(v.row, v.col, v.value)
+			if got != v.Expected && !reflect.DeepEqual(v.ExpectedMatrix, baseMatrix) {
+				t.Errorf("[%s] expected: %v, got %v", name, v.Expected, got)
+			}
+		})
 	}
 }
 
