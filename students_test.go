@@ -60,11 +60,13 @@ func TestSwap(t *testing.T){
 
 
 
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 func TestNew(t *testing.T){
-	tData := map[string]struct {
+	data := map[string]struct {
 		TestString string
 		Expected   *Matrix
 		Err        error
@@ -77,8 +79,7 @@ func TestNew(t *testing.T){
 		"DiffRowsLength": {
 			"1 1 1\n2 2 2 2",
 			nil,
-			errors.Unwrap(fmt.Errorf("Rows need to be the same length")), // this is strange
-			// could not find better solution
+			errors.Unwrap(fmt.Errorf("Rows need to be the same length")), 
 		},
 		"ImproperData": {
 			"a",
@@ -87,14 +88,13 @@ func TestNew(t *testing.T){
 		},
 	}
 
-	for name, v := range tData {
+	for name, v := range data {
 		t.Run(name, func(t *testing.T) {
 			got, err := New(v.TestString)
-			if err != nil && !errors.Is(errors.Unwrap(err), v.Err) { // could not find better solution, think
-				//  the error message from the New() needs some changes for better logic
+			if err != nil && !errors.Is(errors.Unwrap(err), v.Err) { 
 				t.Errorf("[%s] error expected:\"%v\", got:\"%v\".\n", name, v.Err, err)
 			}
-			if !reflect.DeepEqual(v.Expected, got) { // needs to be remembered when compare structs with slices&maps
+			if !reflect.DeepEqual(v.Expected, got) { 
 				t.Errorf("[%s] expected: %v, got %v", name, v.Expected, got)
 			}
 		})
@@ -107,7 +107,7 @@ func TestSet(t *testing.T){
 	needMatrixT := &Matrix{2, 3, []int{1, 1, 1, 2, 5, 2}}
 	needMatrixF := &Matrix{2, 3, []int{1, 1, 1, 2, 2, 2}}
 
-	tData := map[string]struct {
+	data := map[string]struct {
 		row            int
 		col            int
 		value          int
@@ -120,7 +120,7 @@ func TestSet(t *testing.T){
 		"ImproperColNum": {1, 3, 5, needMatrixF, false},
 	}
 
-	for name, v := range tData {
+	for name, v := range data {
 		t.Run(name, func(t *testing.T) {
 			got := baseMatrix.Set(v.row, v.col, v.value)
 			if got != v.Expected && !reflect.DeepEqual(v.ExpectedMatrix, baseMatrix) {
