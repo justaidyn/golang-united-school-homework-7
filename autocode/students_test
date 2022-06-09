@@ -53,6 +53,28 @@ func TestSwap(t *testing.T){
 	}
 }
 
+func TestLess(t *testing.T){
+	tData := map[string]struct {
+		FirstPersonIndex  int
+		SecondPersonIndex int
+		Expected          bool
+	}{
+		"diffDates":             {0, 1, false},
+		"sameDateDiffNames":     {1, 3, false},
+		"sameDateSameFirstName": {1, 2, false},
+	}
+
+	for name, v := range tData {
+		t.Run(name, func(t *testing.T) {
+			got := PersonList.Less(v.FirstPersonIndex, v.SecondPersonIndex)
+			if got != v.Expected {
+				t.Errorf("[%s] expected: %v, got %v", name, v.Expected, got)
+			}
+		})
+	}
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -83,27 +105,6 @@ func TestNew(t *testing.T){
 }
 
 
-// func TestRows(t *testing.T){
-// 	matrix, err := New("1 2\n3 4")
-// 	if err != nil {
-// 		t.Error("Expected nil, got ", err)
-// 	}
-// 	if matrix.Rows() != 2 {
-// 		t.Error("Expected 2, got ", matrix.Rows())
-// 	}
-// }
-
-
-// func TestCols(t *testing.T){	
-// 	matrix, err := New("1 2\n3 4")
-// 	if err != nil {
-// 		t.Error("Expected nil, got ", err)
-// 	}
-// 	if matrix.Cols() != 2 {
-// 		t.Error("Expected 2, got ", matrix.Cols())
-// 	}
-// }
-
 func TestSet(t *testing.T){
 	matrix, err := New("1 2\n3 4")
 	if err != nil {
@@ -113,5 +114,59 @@ func TestSet(t *testing.T){
 	if matrix.data[0] != 5 {
 		t.Error("Expected 5, got ", matrix.data[0])
 	}
+}
 
+func TestRows(t *testing.T){
+	data := struct{
+		TestMatrix *Matrix
+		Expected [][]int
+	}{
+		&Matrix{2,3,[]int{1,2,3,4,5,6}},
+		[][]int{
+			{1,2,3},
+			{4,5,6},
+		},
+	}
+	get := data.TestMatrix.Rows()
+	if len(get) != len(data.Expected) {
+		t.Error("Expected ", len(data.Expected), " got ", len(get))
+	}
+	for i := 0; i < len(get); i++ {
+		if len(get[i]) != len(data.Expected[i]) {
+			t.Error("Expected ", len(data.Expected[i]), " got ", len(get[i]))
+		}
+		for j := 0; j < len(get[i]); j++ {
+			if get[i][j] != data.Expected[i][j] {
+				t.Error("Expected ", data.Expected[i][j], " got ", get[i][j])
+			}
+		}
+	}
+}
+
+func TestCols(t *testing.T){
+	data := struct{
+		TestMatrix *Matrix
+		Expected [][]int
+	}{
+		&Matrix{2,3,[]int{1,2,3,4,5,6}},
+		[][]int{
+			{1,4},
+			{2,5},
+			{3,6},
+		},
+	}
+	get := data.TestMatrix.Cols()
+	if len(get) != len(data.Expected) {
+		t.Error("Expected ", len(data.Expected), " got ", len(get))
+	}
+	for i := 0; i < len(get); i++ {
+		if len(get[i]) != len(data.Expected[i]) {
+			t.Error("Expected ", len(data.Expected[i]), " got ", len(get[i]))
+		}
+		for j := 0; j < len(get[i]); j++ {
+			if get[i][j] != data.Expected[i][j] {
+				t.Error("Expected ", data.Expected[i][j], " got ", get[i][j])
+			}
+		}
+	}	
 }
